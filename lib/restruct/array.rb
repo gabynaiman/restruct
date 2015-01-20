@@ -7,7 +7,7 @@ module Restruct
     def_delegators :to_a, :uniq, :join, :reverse, :+, :-, :&, :|
 
     def at(index)
-      redis.call 'LINDEX', key, index
+      deserialize redis.call('LINDEX', key, index)
     end
 
     def values_at(*args)
@@ -30,10 +30,10 @@ module Restruct
 
     def [](*args)
       if args.count == 1
-        if args.first.is_a? Integer
-          at args.first.to_i
-        elsif args.first.is_a? Range
-          range args.first.first, args.first.last
+        if args[0].is_a? Integer
+          at args[0].to_i
+        elsif args[0].is_a? Range
+          range args[0].first, args[0].last
         else
           validate_index_type! args.first
         end
@@ -48,11 +48,11 @@ module Restruct
       validate_index_type! index
       validate_index_bounds! index
 
-      redis.call 'LSET', key, index, element
+      redis.call 'LSET', key, index, serialize(element)
     end
 
     def push(*elements)
-      redis.call 'RPUSH', key, *elements
+      redis.call 'RPUSH', key, *(elements.map { |e| serialize e })
       self
     end
     
@@ -73,7 +73,7 @@ module Restruct
 
     def pop(count=1)
       if count == 1
-        redis.call 'RPOP', key
+        deserialize redis.call('RPOP', key)
       else
         [count, size].min.times.map { pop }.reverse
       end
@@ -81,14 +81,14 @@ module Restruct
 
     def shift(count=1)
       if count == 1
-        redis.call 'LPOP', key
+        deserialize redis.call('LPOP', key)
       else
         [count, size].min.times.map { shift }
       end
     end
 
     def delete(element)
-      removed_count = redis.call 'LREM', key, 0, element
+      removed_count = redis.call 'LREM', key, 0, serialize(element)
       removed_count > 0 ? element : nil
     end
 
@@ -157,7 +157,7 @@ module Restruct
 
     def range(start, stop)
       return nil if start > size
-      redis.call 'LRANGE', key, start, stop
+      redis.call('LRANGE', key, start, stop).map { |e| deserialize e }
     end
 
     def validate_index_type!(index)
@@ -170,6 +170,14 @@ module Restruct
 
     def out_of_bounds?(index)
       !(-size..size).include?(index)
+    end
+
+    def serialize(string)
+      string
+    end
+
+    def deserialize(string)
+      string
     end
 
   end

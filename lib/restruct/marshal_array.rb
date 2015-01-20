@@ -1,13 +1,14 @@
 module Restruct
   class MarshalArray < Array
 
-    def [](index)
-      element = super
-      Marshal.load element
-    end
+    private
 
-    def push(element)
-      super Marshal.dump(element)
+    def serialize(element)
+      Marshal.dump element
+    end
+    
+    def deserialize(element)
+      Marshal.load element if element
     end
 
   end

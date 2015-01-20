@@ -6,6 +6,7 @@ require_relative 'restruct/version'
 require_relative 'restruct/structure'
 require_relative 'restruct/key'
 require_relative 'restruct/array'
+require_relative 'restruct/marshal_array'
 
 module Restruct
 
