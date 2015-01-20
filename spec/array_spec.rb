@@ -10,7 +10,7 @@ require 'minitest_helper'
       redis.call 'RPUSH', array.key, *(elements.map { |e| array.send(:serialize, e) })
     end
 
-    describe 'Get elements' do
+    describe 'Getters' do
 
       it '[]' do
         fill %w(a b c d e)
@@ -79,7 +79,7 @@ require 'minitest_helper'
 
     end
 
-    describe 'Modify elements' do
+    describe 'Setters' do
 
       it '[]=' do
         fill %w(a b c d)
@@ -309,7 +309,7 @@ require 'minitest_helper'
 
     end
 
-    describe 'Symbols' do
+    describe 'Sets' do
 
       it '+' do
         fill %w(a b c)
