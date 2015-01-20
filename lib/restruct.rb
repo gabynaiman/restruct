@@ -5,7 +5,7 @@ require 'forwardable'
 require_relative 'restruct/version'
 require_relative 'restruct/structure'
 require_relative 'restruct/key'
-require_relative 'restruct/string_array'
+require_relative 'restruct/array'
 
 module Restruct
 

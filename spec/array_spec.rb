@@ -1,8 +1,8 @@
 require 'minitest_helper'
 
-describe Restruct::StringArray do
+describe Restruct::Array do
 
-  let(:array) { Restruct::StringArray.new }
+  let(:array) { Restruct::Array.new }
 
   def fill(elements)
     redis.call 'RPUSH', array.key, *elements
@@ -335,7 +335,7 @@ describe Restruct::StringArray do
     fill %w(a b c)
     
     dump = array.dump
-    other = Restruct::StringArray.new
+    other = Restruct::Array.new
     other.restore dump
 
     other.key.wont_equal array.key
