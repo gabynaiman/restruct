@@ -47,6 +47,12 @@ module Restruct
       self
     end
 
+    def keep_if
+      each { |k,v| delete k unless yield k, v }
+      self
+    end
+    alias_method :select!, :keep_if
+
     def clear
       destroy
       self

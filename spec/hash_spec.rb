@@ -104,6 +104,15 @@ require 'minitest_helper'
         hash.delete_if { |k,v| v == 'x' }.must_equal hash
         hash.to_h.must_equal 'b' => 'y'
       end
+
+      %w(keep_if select!).each do |method|
+        it method do
+          fill a: 'x', b: 'y'
+
+          hash.send(method) { |k,v| v == 'x' }.must_equal hash
+          hash.to_h.must_equal 'a' => 'x'
+        end
+      end
       
     end
 
