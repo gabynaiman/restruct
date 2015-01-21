@@ -119,6 +119,12 @@ describe Restruct::Hash do
     # end
   end
 
+  # it 'Equality' do
+  #   copy = klass.new id: array.id
+  #   assert array == copy
+  #   assert array.eql? copy
+  # end
+  
   # it 'Dump/Restore' do
 
 end

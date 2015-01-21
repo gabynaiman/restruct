@@ -333,6 +333,12 @@ require 'minitest_helper'
 
     end
 
+    it 'Equality' do
+      copy = klass.new id: array.id
+      assert array == copy
+      assert array.eql? copy
+    end
+
     it 'Dump/Restore' do
       fill %w(a b c)
       

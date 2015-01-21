@@ -8,6 +8,13 @@ module Restruct
       @id = Id.new options[:id] || Restruct.generate_id
     end
 
+    def ==(object)
+      object.class == self.class && 
+      object.id == id && 
+      object.redis == redis
+    end
+    alias_method :eql?, :==
+
     def dump
       redis.call 'DUMP', id
     end
