@@ -212,9 +212,9 @@ require 'minitest_helper'
       end
 
       it 'empty?' do
-        array.empty?.must_equal true
+        array.must_be :empty?
         fill %w(a b c)
-        array.empty?.must_equal false
+        array.wont_be :empty?
       end
 
     end
@@ -251,6 +251,10 @@ require 'minitest_helper'
 
     describe 'Enumerable' do
 
+      it 'included module' do
+        assert klass.included_modules.include? Enumerable
+      end
+
       it 'each' do
         fill %w(a b c)
 
@@ -267,44 +271,6 @@ require 'minitest_helper'
         array.each_index { |i| list << i }
 
         list.must_equal [0,1,2]
-      end
-
-      it 'any?' do
-        array.any?.must_equal false
-        fill %w(a b c)
-        array.any?.must_equal true
-        array.any? { |e| e == 'a' }.must_equal true
-        array.any? { |e| e == 'z' }.must_equal false
-      end
-
-      %w(detect find).each do |method|
-        it method do
-          fill %w(a1 b1 a2 b2)
-          array.send(method) { |e| e.start_with? 'b' }.must_equal 'b1'
-          array.send(method) { |e| e.start_with? 'x' }.must_be_nil
-        end
-      end
-
-      %w(select find_all).each do |method|
-        it method do
-          fill %w(a1 b1 a2 b2)
-          array.send(method) { |e| e.start_with? 'b' }.must_equal %w(b1 b2)
-          array.send(method) { |e| e.start_with? 'x' }.must_equal []
-        end
-      end
-
-      %w(map collect).each do |method|
-        it method do
-          fill %w(a1 b1 a2 b2)
-          array.send(method) { |e| e[0] }.must_equal %w(a b a b)
-        end
-      end
-
-      it 'sort' do
-        fill %w(x3 a6 c4 y2 z1 b5)
-
-        array.sort.must_equal %w(a6 b5 c4 x3 y2 z1)
-        array.sort { |e1, e2| e1[1] <=> e2[1] }.must_equal %w(z1 y2 x3 c4 b5 a6)
       end
 
     end
@@ -347,7 +313,7 @@ require 'minitest_helper'
       other.restore dump
 
       other.id.wont_equal array.id
-      other.to_a.must_equal %w(a b c)
+      other.to_a.must_equal array.to_a
     end
 
   end

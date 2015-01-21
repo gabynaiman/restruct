@@ -55,10 +55,7 @@ module Restruct
       redis.call 'RPUSH', id, *(elements.map { |e| serialize e })
       self
     end
-    
-    def <<(element)
-      push element
-    end
+    alias_method :<<, :push
 
     def insert(index, *elements)
       validate_index_type! index
@@ -126,17 +123,13 @@ module Restruct
     def each
       index = 0
       while index < size
-        yield at(index)
+        yield at(index), index
         index += 1
       end
     end
 
     def each_index
-      index = 0
-      while index < size
-        yield index
-        index += 1
-      end
+      each { |_,i| yield i }
     end
 
     def first
