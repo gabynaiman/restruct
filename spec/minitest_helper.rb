@@ -14,4 +14,8 @@ class Minitest::Spec
   def redis
     Restruct.redis
   end
+
+  after do
+    redis.call('KEYS', Restruct::Id.new(:restruct)['*']).each { |k| redis.call 'DEL', k }
+  end
 end
