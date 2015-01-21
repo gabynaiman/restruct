@@ -1,5 +1,5 @@
 module Restruct
-  class MarshalArray < Array
+  class MarshalHash < Hash
     include Marshalizable
   end
 end
