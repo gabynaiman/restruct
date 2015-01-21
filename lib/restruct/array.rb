@@ -105,6 +105,12 @@ module Restruct
       self
     end
 
+    def keep_if
+      each { |e| delete e unless yield e }
+      self
+    end
+    alias_method :select!, :keep_if
+
     def clear
       destroy
       self

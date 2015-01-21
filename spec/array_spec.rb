@@ -200,6 +200,15 @@ require 'minitest_helper'
         array.to_a.must_equal %w(b c b c b c)
       end
 
+      %w(keep_if select!).each do |method|
+        it method do
+          fill %w(a b c a b c a b c)
+
+          array.send(method) { |e| e == 'a' }.must_equal array
+          array.to_a.must_equal %w(a a a)
+        end
+      end
+
     end
 
     describe 'Info' do
