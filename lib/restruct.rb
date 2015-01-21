@@ -1,6 +1,7 @@
 require 'redic'
 require 'class_config'
 require 'forwardable'
+require 'securerandom'
 
 require_relative 'restruct/version'
 require_relative 'restruct/structure'

@@ -7,11 +7,8 @@ module Restruct
     def_delegators :to_set, :union, :|, :+, 
                             :intersection, :&, 
                             :difference, :-,
-                            :proper_subset?, :<,
-                            :subset?, :<=,
-                            :proper_superset?, :>,
-                            :superset?, :>=,
-                            :intersect?, :disjoint?,
+                            :proper_subset?, :subset?,
+                            :proper_superset?, :superset?,
                             :^
 
     def add(member)
@@ -86,6 +83,19 @@ module Restruct
     end
     alias_method :to_primitive, :to_set
     
+    alias_method :<, :proper_subset?
+    alias_method :<=, :subset?
+    alias_method :>, :proper_superset?
+    alias_method :>=, :superset?
+
+    def intersect?(set)
+      !disjoint? set
+    end
+
+    def disjoint?(set)
+      (to_a & set.to_a).empty?
+    end
+
     private
 
     def _add(*members)
