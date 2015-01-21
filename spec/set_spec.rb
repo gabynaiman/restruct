@@ -1,6 +1,6 @@
 require 'minitest_helper'
 
-[Restruct::Set].each do |klass|
+[Restruct::Set, Restruct::MarshalSet].each do |klass|
 
   describe klass do
 

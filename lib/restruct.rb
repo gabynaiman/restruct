@@ -11,6 +11,7 @@ require_relative 'restruct/set'
 require_relative 'restruct/marshalizable'
 require_relative 'restruct/marshal_array'
 require_relative 'restruct/marshal_hash'
+require_relative 'restruct/marshal_set'
 
 module Restruct
 
