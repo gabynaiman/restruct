@@ -21,10 +21,10 @@ module Restruct
 
   attr_config :redis, Redic.new
   attr_config :id_separator, ':'
-  attr_config :id_generator, ->() { SecureRandom.uuid }
+  attr_config :id_generator, ->() { Id.new(:restruct)[SecureRandom.uuid] }
 
   def self.generate_id
-    Id.new(:restruct)[id_generator.call]
+    id_generator.call
   end
 
 end
