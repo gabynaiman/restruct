@@ -88,7 +88,7 @@ require 'minitest_helper'
         fill %w(a b c d)
 
         set.clear.must_equal set
-        set.to_set.must_be_empty
+        set.must_be_empty
       end
       
     end
@@ -238,6 +238,7 @@ require 'minitest_helper'
       copy = klass.new id: set.id
       assert set == copy
       assert set.eql? copy
+      refute set.equal? copy
     end
 
     it 'Dump/Restore' do

@@ -111,7 +111,7 @@ require 'minitest_helper'
         fill a: 'x', b: 'y'
 
         hash.clear.must_equal hash
-        hash.to_h.must_be_empty
+        hash.must_be_empty
       end
 
     end
@@ -223,6 +223,7 @@ require 'minitest_helper'
       copy = klass.new id: hash.id
       assert hash == copy
       assert hash.eql? copy
+      refute hash.equal? copy
     end
 
     it 'Dump/Restore' do

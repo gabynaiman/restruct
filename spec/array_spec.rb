@@ -206,7 +206,7 @@ require 'minitest_helper'
         fill %w(a b c d)
 
         array.clear.must_equal array
-        array.to_a.must_be_empty
+        array.must_be_empty
       end
 
     end
@@ -319,6 +319,7 @@ require 'minitest_helper'
       copy = klass.new id: array.id
       assert array == copy
       assert array.eql? copy
+      refute array.equal? copy
     end
 
     it 'Dump/Restore' do
