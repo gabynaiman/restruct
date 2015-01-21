@@ -217,6 +217,13 @@ require 'minitest_helper'
         array.wont_be :empty?
       end
 
+      it 'include?' do
+        fill %w(a b c)
+
+        assert array.include? 'a'
+        refute array.include? 'z'
+      end
+
     end
 
     describe 'Transformations' do
@@ -313,7 +320,7 @@ require 'minitest_helper'
       other.restore dump
 
       other.id.wont_equal array.id
-      other.to_a.must_equal array.to_a
+      other.to_primitive.must_equal array.to_primitive
     end
 
   end

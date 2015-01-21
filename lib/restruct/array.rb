@@ -120,6 +120,11 @@ module Restruct
       size == 0
     end
 
+    def include?(element)
+      each { |e| return true if e == element }
+      false
+    end
+
     def each
       index = 0
       while index < size

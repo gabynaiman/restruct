@@ -224,7 +224,7 @@ require 'minitest_helper'
       other.restore dump
 
       other.id.wont_equal hash.id
-      other.to_h.must_equal hash.to_h
+      other.to_primitive.must_equal hash.to_primitive
     end
 
   end
