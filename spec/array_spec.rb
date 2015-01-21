@@ -7,7 +7,7 @@ require 'minitest_helper'
     let(:array) { klass.new }
 
     def fill(elements)
-      redis.call 'RPUSH', array.key, *(elements.map { |e| array.send(:serialize, e) })
+      redis.call 'RPUSH', array.id, *(elements.map { |e| array.send(:serialize, e) })
     end
 
     describe 'Getters' do
@@ -340,7 +340,7 @@ require 'minitest_helper'
       other = klass.new
       other.restore dump
 
-      other.key.wont_equal array.key
+      other.id.wont_equal array.id
       other.to_a.must_equal %w(a b c)
     end
 

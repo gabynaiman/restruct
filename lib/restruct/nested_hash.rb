@@ -7,7 +7,7 @@ module Restruct
         const_set :TYPE, type
 
         def [](field)
-          self.class::TYPE.new key: key[field], redis: redis, parent: self
+          self.class::TYPE.new id: id[field], redis: redis, parent: self
         end
 
         def delete(field)
@@ -15,8 +15,8 @@ module Restruct
         end
 
         def keys
-          sections = key.sections.count + 1
-          redis.call('KEYS', key['*']).map do |k| 
+          sections = id.sections.count + 1
+          redis.call('KEYS', id['*']).map do |k| 
             Key.new(k).sections.take(sections).last
           end.uniq
         end
@@ -26,7 +26,7 @@ module Restruct
         end
 
         def key?(field)
-          keys.include? key[field]
+          keys.include? id[field]
         end
 
         def empty?
@@ -34,7 +34,7 @@ module Restruct
         end
 
         def size
-          redis.call('KEYS', key['*']).count
+          redis.call('KEYS', id['*']).count
         end
         alias_method :count, :size
         alias_method :length, :size

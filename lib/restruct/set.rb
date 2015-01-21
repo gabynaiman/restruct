@@ -4,12 +4,12 @@ module Restruct
     include Enumerable
 
     def add(member)
-      redis.call 'SADD', key, member
+      redis.call 'SADD', id, member
     end
     alias_method :<<, :add
 
     def delete(member)
-      redis.call 'SREM', key, member
+      redis.call 'SREM', id, member
     end
 
     def each(&block)
@@ -17,19 +17,19 @@ module Restruct
     end
 
     def empty?
-      redis.call('EXISTS', key) == 0
+      redis.call('EXISTS', id) == 0
     end
 
     def count
-      redis.call 'SCARD', key
+      redis.call 'SCARD', id
     end
 
     def include?(member)
-      redis.call('SISMEMBER', key, member) == 1
+      redis.call('SISMEMBER', id, member) == 1
     end
 
     def to_a
-      redis.call 'SMEMBERS', key
+      redis.call 'SMEMBERS', id
     end
     alias_method :to_primitive, :to_a
 

@@ -5,7 +5,7 @@ describe Restruct::Hash do
   let(:hash) { Restruct::Hash.new }
 
   def fill(data)
-    redis.call 'HMSET', hash.key, *data.flatten
+    redis.call 'HMSET', hash.id, *data.flatten
   end
 
   describe 'Getters' do

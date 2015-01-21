@@ -2,7 +2,7 @@ module Restruct
   class Hash < Structure
 
     def [](field)
-      deserialize redis.call('HGET', key, field)
+      deserialize redis.call('HGET', id, field)
     end
 
     def fetch(field, default=nil, &block)
@@ -15,33 +15,33 @@ module Restruct
     end
 
     # def []=(field, value)
-    #   redis.call 'HSET', key, field, value
+    #   redis.call 'HSET', id, field, value
     # end
 
     # def delete(field)
     #   value = self[field]
-    #   redis.call 'HDEL', key, field
+    #   redis.call 'HDEL', id, field
     #   value
     # end
 
     # def keys
-    #   redis.call 'HKEYS', key
+    #   redis.call 'HKEYS', id
     # end
 
     # def values
-    #   redis.call 'HVALS', key
+    #   redis.call 'HVALS', id
     # end
 
     def key?(field)
-      redis.call('HEXISTS', key, field) == 1
+      redis.call('HEXISTS', id, field) == 1
     end
 
     # def empty?
-    #   redis.call('HLEN', key) == 0
+    #   redis.call('HLEN', id) == 0
     # end
 
     # def size
-    #   redis.call 'HLEN', key
+    #   redis.call 'HLEN', id
     # end
     # alias_method :count, :size
     # alias_method :length, :size
@@ -60,7 +60,7 @@ module Restruct
     # end
 
     def to_h
-      ::Hash[redis.call('HGETALL', key).each_slice(2).to_a]
+      ::Hash[redis.call('HGETALL', id).each_slice(2).to_a]
     end
     # alias_method :to_primitive, :to_h
 

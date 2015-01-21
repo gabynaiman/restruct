@@ -1,24 +1,24 @@
 module Restruct
   class Structure
 
-    attr_reader :redis, :key
+    attr_reader :redis, :id
 
     def initialize(options={})
       @redis = options[:redis] || Restruct.redis
-      @key = Key.new options[:key] || Restruct.generate_key
+      @id = Id.new options[:id] || Restruct.generate_id
     end
 
     def dump
-      redis.call 'DUMP', key
+      redis.call 'DUMP', id
     end
 
     def restore(dump)
       destroy
-      redis.call 'RESTORE', key, 0, dump
+      redis.call 'RESTORE', id, 0, dump
     end
 
     def destroy
-      redis.call 'DEL', key
+      redis.call 'DEL', id
     end
     
   end
