@@ -52,7 +52,7 @@ module Restruct
     end
 
     def push(*elements)
-      redis.call 'RPUSH', id, *(elements.map { |e| serialize e })
+      redis.call 'RPUSH', id, *elements.map { |e| serialize e }
       self
     end
     alias_method :<<, :push

@@ -81,13 +81,6 @@ require 'minitest_helper'
         end
       end
       
-      it 'clear' do
-        fill a: 'x', b: 'y'
-
-        hash.clear.must_equal hash
-        hash.to_h.must_equal Hash.new
-      end
-      
       it 'delete' do
         fill a: 'x', b: 'y'
 
@@ -114,6 +107,13 @@ require 'minitest_helper'
         end
       end
       
+      it 'clear' do
+        fill a: 'x', b: 'y'
+
+        hash.clear.must_equal hash
+        hash.to_h.must_be_empty
+      end
+
     end
 
     describe 'Info' do

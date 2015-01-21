@@ -163,13 +163,6 @@ require 'minitest_helper'
         array.to_a.must_equal %w(a b c x y z)
       end
 
-      it 'clear' do
-        fill %w(a b c d)
-
-        array.clear.must_equal array
-        array.to_a.must_equal []
-      end
-
       it 'delete' do
         fill %w(a b a b a b)
 
@@ -207,6 +200,13 @@ require 'minitest_helper'
           array.send(method) { |e| e == 'a' }.must_equal array
           array.to_a.must_equal %w(a a a)
         end
+      end
+
+      it 'clear' do
+        fill %w(a b c d)
+
+        array.clear.must_equal array
+        array.to_a.must_be_empty
       end
 
     end
