@@ -8,9 +8,10 @@
 
 Redis structures
 
-- Array / StringArray
+- Array
 - Set
-- Hash / NestedHash
+- Hash
+- NestedHash
 
 ## Installation
 
