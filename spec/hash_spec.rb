@@ -68,6 +68,15 @@ describe Restruct::Hash do
         hash.to_h.must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
       end
     end
+
+    %w(update merge!).each do |method|
+      it method do
+        fill a: 'x', b: 'y'
+
+        hash.send(method, a: 'a', c: 'z').must_equal hash
+        hash.to_h.must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
+      end
+    end
     
     it 'clear' do
       fill a: 'x', b: 'y'

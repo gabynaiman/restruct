@@ -30,6 +30,12 @@ module Restruct
     end
     alias_method :[]=, :store
 
+    def update(hash)
+      hash.each { |k,v| store k, v }
+      self
+    end
+    alias_method :merge!, :update
+
     def delete(key)
       value = self[key]
       redis.call 'HDEL', id, key
@@ -92,7 +98,9 @@ module Restruct
     end
 
     def to_h
-      ::Hash[redis.call('HGETALL', id).each_slice(2).to_a]
+      redis.call('HGETALL', id).each_slice(2).each_with_object({}) do |(k,v), hash|
+        hash[k] = deserialize v
+      end
     end
     alias_method :to_primitive, :to_h
 
