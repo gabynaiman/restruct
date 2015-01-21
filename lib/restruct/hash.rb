@@ -1,68 +1,100 @@
 module Restruct
   class Hash < Structure
 
-    def [](field)
-      deserialize redis.call('HGET', id, field)
+    include Enumerable
+    extend Forwardable
+
+    def_delegators :to_h, :merge, :flatten, :invert
+
+    def [](key)
+      deserialize redis.call('HGET', id, key)
     end
 
-    def fetch(field, default=nil, &block)
-      if key? field
-        self[field]
+    def fetch(key, default=nil, &block)
+      if key? key
+        self[key]
       else
-        raise KeyError, "key not found: #{field}" if default.nil? && block.nil?
-        default || block.call(field)
+        raise KeyError, "key not found: #{key}" if default.nil? && block.nil?
+        default || block.call(key)
       end
     end
 
-    # def []=(field, value)
-    #   redis.call 'HSET', id, field, value
-    # end
-
-    # def delete(field)
-    #   value = self[field]
-    #   redis.call 'HDEL', id, field
-    #   value
-    # end
-
-    # def keys
-    #   redis.call 'HKEYS', id
-    # end
-
-    # def values
-    #   redis.call 'HVALS', id
-    # end
-
-    def key?(field)
-      redis.call('HEXISTS', id, field) == 1
+    def key(value)
+      index = values.index value
+      keys[index] if index
     end
 
-    # def empty?
-    #   redis.call('HLEN', id) == 0
-    # end
+    def store(key, value)
+      redis.call 'HSET', id, key, serialize(value)
+      value
+    end
+    alias_method :[]=, :store
 
-    # def size
-    #   redis.call 'HLEN', id
-    # end
-    # alias_method :count, :size
-    # alias_method :length, :size
+    def delete(key)
+      value = self[key]
+      redis.call 'HDEL', id, key
+      value
+    end
 
-    # def each
-    #   keys.each { |field| yield field, self[field] }
-    # end
+    def delete_if
+      each { |k,v| delete k if yield k, v }
+      self
+    end
 
-    # def each_with_object(object)
-    #   keys.each { |field| yield [field, self[field]], object }
-    #   object
-    # end
+    def clear
+      destroy
+      self
+    end
 
-    # def map
-    #   keys.map { |field| yield field, self[field] }
-    # end
+    def keys
+      redis.call 'HKEYS', id
+    end
+
+    def values
+      redis.call('HVALS', id).map { |v| deserialize v }
+    end
+
+    def values_at(*keys)
+      keys.map { |k| self[k] }
+    end
+
+    def key?(key)
+      redis.call('HEXISTS', id, key) == 1
+    end
+    alias_method :has_key?, :key?
+
+    def value?(value)
+      values.include? value
+    end
+    alias_method :has_value?, :value?
+
+    def size
+      redis.call 'HLEN', id
+    end
+    alias_method :count, :size
+    alias_method :length, :size
+
+    def empty?
+      size == 0
+    end
+
+    def each
+      keys.each { |key| yield key, self[key] }
+    end
+    alias_method :each_pair, :each
+
+    def each_key
+      each { |k,v| yield k }
+    end
+
+    def each_value
+      each { |k,v| yield v }
+    end
 
     def to_h
       ::Hash[redis.call('HGETALL', id).each_slice(2).to_a]
     end
-    # alias_method :to_primitive, :to_h
+    alias_method :to_primitive, :to_h
 
     private
 

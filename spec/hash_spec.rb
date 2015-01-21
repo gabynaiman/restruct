@@ -38,93 +38,181 @@ describe Restruct::Hash do
       hash.key('z').must_be_nil
     end
 
-    # it keys
-    # it values
-    # it values_at
+    it 'keys' do
+      fill a: 'x', b: 'y', c: 'z'
+      hash.keys.must_equal %w(a b c)
+    end
+
+    it 'values' do
+      fill a: 'x', b: 'y', c: 'z'
+      hash.values.must_equal %w(x y z)
+    end
+
+    it 'values_at' do
+      fill a: 'x', b: 'y', c: 'z'
+      hash.values_at(:a, :f, :b, :g, :c).must_equal ['x', nil, 'y', nil, 'z']
+    end
+
   end
 
   describe 'Setters' do
-    # it []=
-    # it clear
-    # it delete
-    # it delete_if
-    # it merge
-    # it replace
-    # it shift
-    # it store
-    # it update
+    
+    %w([]= store).each do |method|
+      it method do
+        fill a: 'x', b: 'y'
+
+        hash.send(method, :a, 'a').must_equal 'a'
+        hash.to_h.must_equal 'a' => 'a', 'b' => 'y'
+
+        hash.send(method, :c, 'z').must_equal 'z'
+        hash.to_h.must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
+      end
+    end
+    
+    it 'clear' do
+      fill a: 'x', b: 'y'
+
+      hash.clear.must_equal hash
+      hash.to_h.must_equal Hash.new
+    end
+    
+    it 'delete' do
+      fill a: 'x', b: 'y'
+
+      hash.delete(:b).must_equal 'y'
+      hash.to_h.must_equal 'a' => 'x'
+      
+      hash.delete(:c).must_be_nil
+      hash.to_h.must_equal 'a' => 'x'
+    end
+    
+    it 'delete_if' do
+      fill a: 'x', b: 'y'
+
+      hash.delete_if { |k,v| v == 'x' }.must_equal hash
+      hash.to_h.must_equal 'b' => 'y'
+    end
+    
   end
 
   describe 'Info' do
-    # %w(size count length).each do |method|
-    #   it method do
-    #     fill %w(a b c)
-    #     hash.send(method).must_equal 3
-    #   end
-    # end
-    # it empty?
-    # it key?
-    # it has_key?
-    # it has_value?
-    # it value?
+
+    %w(size count length).each do |method|
+      it method do
+        fill a: 'x', b: 'y'
+        hash.send(method).must_equal 2
+      end
+    end
+    
+    it 'empty?' do
+      hash.must_be :empty?
+      fill a: 'x', b: 'y'
+      hash.wont_be :empty?
+    end
+
+    %w(key? has_key?).each do |method|
+      it method do
+        fill a: 'x', b: 'y'
+
+        assert hash.send(method, :a)
+        refute hash.send(method, :c)
+      end
+    end
+    
+    %w(value? has_value?).each do |method|
+      it method do
+        fill a: 'x', b: 'y'
+
+        assert hash.send(method, 'x')
+        refute hash.send(method, 'z')
+      end
+    end
+
   end
 
   describe 'Transformations' do
-    # it flatten
-    # it invert
+
+    %w(to_h to_primitive).each do |method|
+      it method do
+        fill a: 'x', b: 'y'
+        hash.send(method).must_equal 'a' => 'x', 'b' => 'y'
+      end
+    end
+
+    it 'merge' do
+      fill a: 'x', b: 'y'
+      hash.merge('c' => 'z', 'a' => 'a').must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
+    end
+    
+    it 'flatten' do
+      fill a: 'x', b: 'y'
+      hash.flatten.must_equal %w(a x b y)
+    end
+
+    it 'invert' do
+      fill a: 'x', b: 'y'
+      hash.invert.must_equal 'x' => 'a', 'y' => 'b'
+    end
+
   end
 
   describe 'Enumerable' do
-    # it each
-    # it each_key
-    # it each_pair
-    # it each_value
 
-    # it 'any?' do
-    #   hash.any?.must_equal false
-    #   fill %w(a b c)
-    #   hash.any?.must_equal true
-    #   array.any? { |e| e == 'a' }.must_equal true
-    #   array.any? { |e| e == 'z' }.must_equal false
-    # end
+    it 'included module' do
+      assert Restruct::Hash.included_modules.include? Enumerable
+    end
 
-    # %w(detect find).each do |method|
-    #   it method do
-    #     fill %w(a1 b1 a2 b2)
-    #     array.send(method) { |e| e.start_with? 'b' }.must_equal 'b1'
-    #     array.send(method) { |e| e.start_with? 'x' }.must_be_nil
-    #   end
-    # end
+    %w(each each_pair).each do |method|
+      it method do
+        fill a: 'x', b: 'y'
 
-    # %w(select find_all).each do |method|
-    #   it method do
-    #     fill %w(a1 b1 a2 b2)
-    #     array.send(method) { |e| e.start_with? 'b' }.must_equal %w(b1 b2)
-    #     array.send(method) { |e| e.start_with? 'x' }.must_equal []
-    #   end
-    # end
+        keys = []
+        values = []
+        hash.send(method) do |k,v|
+          keys << k
+          values << v
+        end
 
-    # %w(map collect).each do |method|
-    #   it method do
-    #     fill %w(a1 b1 a2 b2)
-    #     array.send(method) { |e| e[0] }.must_equal %w(a b a b)
-    #   end
-    # end
+        keys.must_equal hash.keys
+        values.must_equal hash.values
+      end
+    end
+    
+    it 'each_key' do
+      fill a: 'x', b: 'y'
 
-    # it 'sort' do
-    #   fill %w(x3 a6 c4 y2 z1 b5)
+      keys = []
+      hash.each_key { |k| keys << k }
 
-    #   array.sort.must_equal %w(a6 b5 c4 x3 y2 z1)
-    #   array.sort { |e1, e2| e1[1] <=> e2[1] }.must_equal %w(z1 y2 x3 c4 b5 a6)
-    # end
+      keys.must_equal hash.keys
+    end
+    
+    it 'each_value' do
+      fill a: 'x', b: 'y'
+
+      values = []
+      hash.each_value { |v| values << v }
+
+      values.must_equal hash.values
+    end
+
   end
 
-  # it 'Equality' do
-  #   copy = klass.new id: array.id
-  #   assert array == copy
-  #   assert array.eql? copy
-  # end
-  
-  # it 'Dump/Restore' do
+  it 'Equality' do
+    copy = Restruct::Hash.new id: hash.id
+    assert hash == copy
+    assert hash.eql? copy
+  end
+
+  it 'Dump/Restore' do
+    fill a: 'x', b: 'y'
+    
+    dump = hash.dump
+    other = Restruct::Hash.new
+    other.restore dump
+
+    other.id.wont_equal hash.id
+    other.to_h.must_equal hash.to_h
+  end
 
 end
