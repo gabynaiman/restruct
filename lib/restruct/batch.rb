@@ -5,8 +5,9 @@ module Restruct
       def execute(redis=nil)
         redis ||= Restruct.redis
         multi redis
-        yield
+        result = yield
         exec redis
+        result
       rescue => ex
         discard redis
         raise ex
