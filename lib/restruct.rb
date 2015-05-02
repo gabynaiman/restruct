@@ -9,11 +9,13 @@ require_relative 'restruct/id'
 require_relative 'restruct/array'
 require_relative 'restruct/set'
 require_relative 'restruct/hash'
+require_relative 'restruct/queue'
 require_relative 'restruct/nested_hash'
 require_relative 'restruct/marshalizable'
 require_relative 'restruct/marshal_array'
 require_relative 'restruct/marshal_set'
 require_relative 'restruct/marshal_hash'
+require_relative 'restruct/marshal_queue'
 require_relative 'restruct/batch'
 
 module Restruct
