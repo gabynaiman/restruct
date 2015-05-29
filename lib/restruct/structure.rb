@@ -27,6 +27,10 @@ module Restruct
     def destroy
       redis.call 'DEL', id
     end
+
+    def exists?
+      redis.call('EXISTS', id) == 1
+    end
     
   end
 end
