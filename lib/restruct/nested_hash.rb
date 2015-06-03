@@ -9,7 +9,7 @@ module Restruct
         const_set :TYPE, type
 
         def [](key)
-          self.class::TYPE.new id: id[key], redis: redis, parent: self
+          self.class::TYPE.new id: id[key], connection: connection, parent: self
         end
 
         def fetch(key)
@@ -39,7 +39,7 @@ module Restruct
 
         def keys
           sections = id.sections.count + 1
-          redis.call('KEYS', id['*']).map do |k| 
+          connection.call('KEYS', id['*']).map do |k| 
             Id.new(k).sections.take(sections).last
           end.uniq.sort
         end

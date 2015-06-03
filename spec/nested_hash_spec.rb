@@ -2,12 +2,12 @@ require 'minitest_helper'
 
 class Counter < Restruct::Structure
   def current
-    (redis.call('GET', id) || 0).to_i
+    (connection.call('GET', id) || 0).to_i
   end
   alias_method :to_primitive, :current
 
   def incr
-    redis.call 'SET', id, current + 1
+    connection.call 'SET', id, current + 1
     self
   end
 end

@@ -8,7 +8,7 @@ require 'minitest_helper'
 
     def fill(data)
       data.each { |k,v| data[k] = hash.send(:serialize, v) }
-      redis.call 'HMSET', hash.id, *data.flatten
+      connection.call 'HMSET', hash.id, *data.flatten
     end
 
     describe 'Getters' do

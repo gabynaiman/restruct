@@ -12,9 +12,10 @@ describe Restruct::Locker do
       locker.locked_by.must_equal 'process_1'
       
       locker.lock(:process_1) { }
+      locker.to_h.must_equal({"key"=>"process_1", "exclusive"=>"false", "nested"=>"1"})
 
-      error = proc { locker.lock :process_2 }.must_raise Restruct::Locker::Error
-      #error.message.must_equal 'test already locked by process_1'
+      error = proc { locker.lock :process_2 }.must_raise Restruct::LockerError
+      error.message.must_equal 'Lock process_2 (exclusive=false) fail. Alradey locked by process_1 (exclusive=false)'
     end
 
     locker.wont_be :locked?
@@ -27,18 +28,18 @@ describe Restruct::Locker do
       locker.must_be :locked?
       locker.locked_by.must_equal 'process_1'
 
-      error = proc { locker.lock! :process_1 }.must_raise Restruct::Locker::Error
-      #error.message.must_equal 'test already locked by process_1'
+      error = proc { locker.lock! :process_1 }.must_raise Restruct::LockerError
+      error.message.must_equal 'Lock process_1 (exclusive=true) fail. Alradey locked by process_1 (exclusive=true)'
 
-      error = proc { locker.lock :process_2 }.must_raise Restruct::Locker::Error
-      #error.message.must_equal 'test already locked by process_1'
+      error = proc { locker.lock :process_2 }.must_raise Restruct::LockerError
+      error.message.must_equal 'Lock process_2 (exclusive=false) fail. Alradey locked by process_1 (exclusive=true)'
     end
 
     locker.wont_be :locked?
   end
 
   it 'Force unlock' do
-    redis.call('HSET', locker.id, 'key', :process_1)
+    connection.call('HSET', locker.id, 'key', :process_1)
 
     locker.must_be :locked?
     locker.locked_by.must_equal 'process_1'
@@ -48,15 +49,14 @@ describe Restruct::Locker do
     locker.wont_be :locked?
   end
 
-  it 'Multiple update sharing locker' do
-    test_id = Restruct.generate_id[:test_counter]
+  it 'Threads safe' do
+    test_id = Restruct.generate_id[:test]
 
-    threads = 10.times.map do |i|
+    threads = 10.times.map do |thread_number|
       Thread.new do
-        10.times do
+        10.times do |iteration|
           locker.lock :process_1 do
-            # TODO: grabar en una lista Nro_thread - iteracion (1-1,1-2,2-1)
-            redis.call("HINCRBY", test_id, 'counter', 1)
+            connection.call 'RPUSH', test_id, "#{thread_number}-#{iteration}"
           end
         end
       end
@@ -65,7 +65,49 @@ describe Restruct::Locker do
     threads.each(&:join)
 
     locker.wont_be :locked?
-    redis.call('HGET', test_id, 'counter').must_equal '100'
+
+    expected_list = []
+    10.times do |i|
+      10.times do |j|
+        expected_list << "#{i}-#{j}"
+      end
+    end
+
+    list = connection.call('LRANGE', test_id, 0, -1)
+    list.sort.must_equal expected_list
+    list.wont_equal expected_list
+  end
+
+  it 'Multiples process' do
+    test_id = Restruct.generate_id[:test]
+    locker_id = locker.id
+
+    pids = 10.times.map do |thread_number|
+      Process.fork do
+        connection = Restruct::Connection.new
+        locker = Restruct::Locker.new id: locker_id, connection: connection
+        10.times do |iteration|
+          locker.lock :process_1 do
+            connection.call 'RPUSH', test_id, "#{thread_number}-#{iteration}"
+          end
+        end
+      end
+    end
+
+    Process.waitall
+
+    locker.wont_be :locked?
+
+    expected_list = []
+    10.times do |i|
+      10.times do |j|
+        expected_list << "#{i}-#{j}"
+      end
+    end
+
+    list = connection.call('LRANGE', test_id, 0, -1)
+    list.sort.must_equal expected_list
+    list.wont_equal expected_list
   end
   
 end

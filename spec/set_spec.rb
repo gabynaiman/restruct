@@ -7,7 +7,7 @@ require 'minitest_helper'
     let(:set) { klass.new }
 
     def fill(elements)
-      redis.call 'SADD', set.id, *(elements.map { |e| set.send(:serialize, e) })
+      connection.call 'SADD', set.id, *(elements.map { |e| set.send(:serialize, e) })
     end
 
     describe 'Setters' do

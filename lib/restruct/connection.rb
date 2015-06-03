@@ -1,11 +1,6 @@
 module Restruct
   class Connection
 
-    Error                = Class.new(StandardError)
-    NoScriptError        = Class.new(Error)
-    CompilingScriptError = Class.new(Error)
-    ScriptError          = Class.new(Error)
-
     attr_reader :redis
    
     def initialize(*args)
@@ -13,9 +8,11 @@ module Restruct
       @scripts = {}
     end
 
-    def call(*args, &block)
-      result = redis.call
-      raise error_from(result) if result.is_a? ::RuntimeError
+    def call(*args)
+      raise ArgumentError if args.empty?
+      result = redis.call! *args
+    rescue RuntimeError => ex
+      raise ConnectionErrorFactory.create(ex)
     end
 
     def script(lua_src, *args)

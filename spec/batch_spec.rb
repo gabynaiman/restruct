@@ -5,7 +5,7 @@ describe Restruct::Batch do
   let(:connection) { Redic.new }
   
   it 'Execute' do
-    hash = Restruct::Hash.new redis: connection
+    hash = Restruct::Hash.new connection: connection
     
     Restruct::Batch.execute do
       h = Restruct::Hash.new id: hash.id
@@ -18,7 +18,7 @@ describe Restruct::Batch do
   end
 
   it 'Discard' do
-    hash = Restruct::Hash.new redis: connection
+    hash = Restruct::Hash.new connection: connection
     
     proc do
       Restruct::Batch.execute do
@@ -33,7 +33,7 @@ describe Restruct::Batch do
   end
 
   it 'Nested' do
-    hash = Restruct::Hash.new redis: connection
+    hash = Restruct::Hash.new connection: connection
     
     Restruct::Batch.execute do
       h = Restruct::Hash.new id: hash.id

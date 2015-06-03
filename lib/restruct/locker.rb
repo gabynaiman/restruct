@@ -1,16 +1,8 @@
 module Restruct
   class Locker < Structure
 
-    REGISTER_LUA   = File.read '...'
-    UNREGISTER_LUA = File.read '...'
-
-    class Error < StandardError
-      attr_reader :message
-
-      def initialize(message)
-        @message = message
-      end
-    end
+    REGISTER_LUA   = File.read "#{File.dirname(__FILE__)}/../../lua/register.lua"
+    UNREGISTER_LUA = File.read "#{File.dirname(__FILE__)}/../../lua/unregister.lua"
 
     def lock(key, &block)
       _lock key, false, &block
@@ -25,24 +17,24 @@ module Restruct
     alias_method :locked?, :exists?
 
     def key
-      redis.call('HGET', id, 'key')
+      connection.call('HGET', id, 'key')
     end
     alias_method :locked_by, :key
 
     def to_h
-      ::Hash[redis.call('HGETALL', id).each_slice(2)]
+      ::Hash[connection.call('HGETALL', id).each_slice(2).to_a]
     end
     alias_method :to_primitive, :to_h
     
     private
 
     def _lock(key, exclusive)
-      redis.script REGISTER_LUA,   0, id, key, exclusive
+      connection.script REGISTER_LUA,   0, id, key, exclusive
       yield
-      redis.script UNREGISTER_LUA, 0, id, key, exclusive
+      connection.script UNREGISTER_LUA, 0, id, key, exclusive
     
-    rescue Connection::ScriptError => ex
-      raise Error, ex.message
+    rescue Restruct::ConnectionError => ex
+      raise LockerError.new ex
     end
 
   end

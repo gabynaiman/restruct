@@ -57,7 +57,7 @@ module Restruct
     end
 
     def size
-      redis.call 'SCARD', id
+      connection.call 'SCARD', id
     end
     alias_method :count, :size
     alias_method :length, :size
@@ -67,7 +67,7 @@ module Restruct
     end
 
     def include?(member)
-      redis.call('SISMEMBER', id, serialize(member)) == 1
+      connection.call('SISMEMBER', id, serialize(member)) == 1
     end
 
     def each(&block)
@@ -75,7 +75,7 @@ module Restruct
     end
 
     def to_a
-      redis.call('SMEMBERS', id).map { |e| deserialize e }
+      connection.call('SMEMBERS', id).map { |e| deserialize e }
     end
 
     def to_set
@@ -99,11 +99,11 @@ module Restruct
     private
 
     def _add(*members)
-      redis.call 'SADD', id, *members.map { |m| serialize m }
+      connection.call 'SADD', id, *members.map { |m| serialize m }
     end
 
     def _delete(*members)
-      redis.call 'SREM', id, *members.map { |m| serialize m }
+      connection.call 'SREM', id, *members.map { |m| serialize m }
     end
 
 

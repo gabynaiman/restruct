@@ -2,15 +2,15 @@ module Restruct
   class Queue < Structure
 
     def push(object)
-      redis.call 'RPUSH', id, serialize(object)
+      connection.call 'RPUSH', id, serialize(object)
     end
 
     def pop
-      deserialize redis.call('LPOP', id)
+      deserialize connection.call('LPOP', id)
     end
 
     def size
-      redis.call 'LLEN', id
+      connection.call 'LLEN', id
     end
     alias_method :count, :size
     alias_method :length, :size
@@ -20,7 +20,7 @@ module Restruct
     end
 
     def to_a
-      redis.call('LRANGE', id, 0, -1).map { |o| deserialize o }
+      connection.call('LRANGE', id, 0, -1).map { |o| deserialize o }
     end
     alias_method :to_primitive, :to_a
 

@@ -11,11 +11,11 @@ Turn.config do |c|
 end
 
 class Minitest::Spec
-  def redis
-    Restruct.redis
+  def connection
+    Restruct.connection
   end
 
   after do
-    redis.call('KEYS', Restruct::Id.new(:restruct)['*']).each { |k| redis.call 'DEL', k }
+    connection.call('KEYS', Restruct::Id.new(:restruct)['*']).each { |k| connection.call 'DEL', k }
   end
 end

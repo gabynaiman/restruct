@@ -7,7 +7,7 @@ require 'minitest_helper'
     let(:array) { klass.new }
 
     def fill(elements)
-      redis.call 'RPUSH', array.id, *(elements.map { |e| array.send(:serialize, e) })
+      connection.call 'RPUSH', array.id, *(elements.map { |e| array.send(:serialize, e) })
     end
 
     describe 'Getters' do

@@ -1,21 +1,21 @@
-local redis_key = ARGV[1]
-local locker_key = ARGV[2]
+local locker_id = ARGV[1]
+local lock_key  = ARGV[2]
 local exclusive = ARGV[3]
 
-if redis.call('EXISTS', redis_key ) == 1 then
-  if exclusive == "true" then
-    error("No se puede lockear exclusivo. Ya está lockeado")
-  end
-  if redis.call('HEXISTS', redis_key, 'exclusive' ) == 1 and redis.call('HGET', redis_key, 'exclusive') == 'true' then
-    error("Ya está lockeado exclusivo")
-  end
-  if redis.call('HEXISTS', redis_key, 'key' ) == 1 then
-    if redis.call('HGET', redis_key, 'key') ~= locker_key then
-      error("Está lockeado por otro")
-    end
-  end
+if redis.call('EXISTS', locker_id) == 1 then
+  local actual_lock_key = redis.call('HGET', locker_id, 'key')
+  local actual_exclusive = redis.call('HGET', locker_id, 'exclusive')
+
+  local error_message = "Lock " .. lock_key .. " (exclusive=" .. exclusive .. ") fail. Alradey locked by " .. actual_lock_key .. " (exclusive=" .. actual_exclusive .. ")"
+
+  if exclusive == "true" or
+     actual_exclusive == 'true'  or
+     actual_lock_key ~= lock_key then
+    
+    error(error_message)
+  end 
 end
 
-redis.call('HSET', redis_key, 'key', locker_key)
-redis.call('HSET', redis_key, 'exclusive', exclusive)
-redis.call("HINCRBY", redis_key, 'nested', 1)
+redis.call('HSET', locker_id, 'key', lock_key)
+redis.call('HSET', locker_id, 'exclusive', exclusive)
+redis.call("HINCRBY", locker_id, 'nested', 1)

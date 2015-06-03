@@ -2,14 +2,14 @@ module Restruct
   class Batch
     class << self
 
-      def execute(redis=nil)
-        redis ||= Restruct.redis
-        multi redis
+      def execute(connection=nil)
+        connection ||= Restruct.connection
+        multi connection
         result = yield
-        exec redis
+        exec connection
         result
       rescue => ex
-        discard redis
+        discard connection
         raise ex
       end
 
@@ -19,19 +19,19 @@ module Restruct
         @nesting ||= ::Hash.new { |h,k| h[k] = 0 }
       end
 
-      def multi(redis)
-        redis.call 'MULTI' if nesting[redis] == 0
-        nesting[redis] += 1
+      def multi(connection)
+        connection.call 'MULTI' if nesting[connection] == 0
+        nesting[connection] += 1
       end
 
-      def exec(redis)
-        nesting[redis] -= 1
-        redis.call 'EXEC' if nesting[redis] == 0
+      def exec(connection)
+        nesting[connection] -= 1
+        connection.call 'EXEC' if nesting[connection] == 0
       end
 
-      def discard(redis)
-        nesting[redis] -= 1
-        redis.call 'DISCARD' if nesting[redis] == 0
+      def discard(connection)
+        nesting[connection] -= 1
+        connection.call 'DISCARD' if nesting[connection] == 0
       end
 
     end

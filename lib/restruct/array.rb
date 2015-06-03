@@ -7,7 +7,7 @@ module Restruct
     def_delegators :to_a, :uniq, :join, :reverse, :+, :-, :&, :|
 
     def at(index)
-      deserialize redis.call('LINDEX', id, index)
+      deserialize connection.call('LINDEX', id, index)
     end
 
     def values_at(*args)
@@ -48,11 +48,11 @@ module Restruct
       validate_index_type! index
       validate_index_bounds! index
 
-      redis.call 'LSET', id, index, serialize(element)
+      connection.call 'LSET', id, index, serialize(element)
     end
 
     def push(*elements)
-      redis.call 'RPUSH', id, *elements.map { |e| serialize e }
+      connection.call 'RPUSH', id, *elements.map { |e| serialize e }
       self
     end
     alias_method :<<, :push
@@ -70,7 +70,7 @@ module Restruct
 
     def pop(count=1)
       if count == 1
-        deserialize redis.call('RPOP', id)
+        deserialize connection.call('RPOP', id)
       else
         [count, size].min.times.map { pop }.reverse
       end
@@ -78,14 +78,14 @@ module Restruct
 
     def shift(count=1)
       if count == 1
-        deserialize redis.call('LPOP', id)
+        deserialize connection.call('LPOP', id)
       else
         [count, size].min.times.map { shift }
       end
     end
 
     def delete(element)
-      removed_count = redis.call 'LREM', id, 0, serialize(element)
+      removed_count = connection.call 'LREM', id, 0, serialize(element)
       removed_count > 0 ? element : nil
     end
 
@@ -117,7 +117,7 @@ module Restruct
     end
 
     def size
-      redis.call 'LLEN', id
+      connection.call 'LLEN', id
     end
     alias_method :count, :size
     alias_method :length, :size
@@ -161,7 +161,7 @@ module Restruct
 
     def range(start, stop)
       return nil if start > size
-      redis.call('LRANGE', id, start, stop).map { |e| deserialize e }
+      connection.call('LRANGE', id, start, stop).map { |e| deserialize e }
     end
 
     def validate_index_type!(index)

@@ -7,7 +7,7 @@ module Restruct
     def_delegators :to_h, :merge, :flatten, :invert
 
     def [](key)
-      deserialize redis.call('HGET', id, key)
+      deserialize connection.call('HGET', id, key)
     end
 
     def fetch(key, default=nil, &block)
@@ -25,7 +25,7 @@ module Restruct
     end
 
     def store(key, value)
-      redis.call 'HSET', id, key, serialize(value)
+      connection.call 'HSET', id, key, serialize(value)
       value
     end
     alias_method :[]=, :store
@@ -38,7 +38,7 @@ module Restruct
 
     def delete(key)
       value = self[key]
-      redis.call 'HDEL', id, key
+      connection.call 'HDEL', id, key
       value
     end
 
@@ -59,11 +59,11 @@ module Restruct
     end
 
     def keys
-      redis.call 'HKEYS', id
+      connection.call 'HKEYS', id
     end
 
     def values
-      redis.call('HVALS', id).map { |v| deserialize v }
+      connection.call('HVALS', id).map { |v| deserialize v }
     end
 
     def values_at(*keys)
@@ -71,7 +71,7 @@ module Restruct
     end
 
     def key?(key)
-      redis.call('HEXISTS', id, key) == 1
+      connection.call('HEXISTS', id, key) == 1
     end
     alias_method :has_key?, :key?
 
@@ -81,7 +81,7 @@ module Restruct
     alias_method :has_value?, :value?
 
     def size
-      redis.call 'HLEN', id
+      connection.call 'HLEN', id
     end
     alias_method :count, :size
     alias_method :length, :size
@@ -104,7 +104,7 @@ module Restruct
     end
 
     def to_h
-      redis.call('HGETALL', id).each_slice(2).each_with_object({}) do |(k,v), hash|
+      connection.call('HGETALL', id).each_slice(2).each_with_object({}) do |(k,v), hash|
         hash[k] = deserialize v
       end
     end
