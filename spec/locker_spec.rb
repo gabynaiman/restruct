@@ -78,36 +78,38 @@ describe Restruct::Locker do
     list.wont_equal expected_list
   end
 
-  it 'Multiples process' do
-    test_id = Restruct.generate_id[:test]
-    locker_id = locker.id
+  if RUBY_ENGINE != 'jruby'
+    it 'Multiples process' do
+      test_id = Restruct.generate_id[:test]
+      locker_id = locker.id
 
-    pids = 10.times.map do |thread_number|
-      Process.fork do
-        connection = Restruct::Connection.new
-        locker = Restruct::Locker.new id: locker_id, connection: connection
-        10.times do |iteration|
-          locker.lock :process_1 do
-            connection.call 'RPUSH', test_id, "#{thread_number}-#{iteration}"
+      pids = 10.times.map do |thread_number|
+        Process.fork do
+          connection = Restruct::Connection.new
+          locker = Restruct::Locker.new id: locker_id, connection: connection
+          10.times do |iteration|
+            locker.lock :process_1 do
+              connection.call 'RPUSH', test_id, "#{thread_number}-#{iteration}"
+            end
           end
         end
       end
-    end
 
-    Process.waitall
+      Process.waitall
 
-    locker.wont_be :locked?
+      locker.wont_be :locked?
 
-    expected_list = []
-    10.times do |i|
-      10.times do |j|
-        expected_list << "#{i}-#{j}"
+      expected_list = []
+      10.times do |i|
+        10.times do |j|
+          expected_list << "#{i}-#{j}"
+        end
       end
-    end
 
-    list = connection.call('LRANGE', test_id, 0, -1)
-    list.sort.must_equal expected_list
-    list.wont_equal expected_list
+      list = connection.call('LRANGE', test_id, 0, -1)
+      list.sort.must_equal expected_list
+      list.wont_equal expected_list
+    end
   end
   
 end
