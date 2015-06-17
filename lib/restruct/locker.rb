@@ -30,9 +30,10 @@ module Restruct
 
     def _lock(key, exclusive)
       connection.script REGISTER_LUA,   0, id, key, exclusive
-      yield
+      result = yield
       connection.script UNREGISTER_LUA, 0, id, key, exclusive
-    
+      result
+
     rescue Restruct::ConnectionError => ex
       raise LockerError.new ex
     end

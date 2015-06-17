@@ -4,6 +4,14 @@ describe Restruct::Locker do
 
   let(:locker) { Restruct::Locker.new }
 
+  it 'Return block result' do
+    result = locker.lock :process_1 do
+      'OK'  
+    end
+
+    result.must_equal 'OK'
+  end
+
   it 'Flexible' do
     locker.wont_be :locked?
 
