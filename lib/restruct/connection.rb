@@ -11,6 +11,8 @@ module Restruct
     def call(*args)
       raise ArgumentError if args.empty?
       result = redis.call! *args
+    rescue Errno::ECONNREFUSED, Errno::EADDRNOTAVAIL => ex
+      retry
     rescue RuntimeError => ex
       raise ConnectionErrorFactory.create(ex)
     end
@@ -21,6 +23,10 @@ module Restruct
     rescue NoScriptError
       @scripts.delete lua_src
       retry
+    end
+
+    def url
+      redis.url
     end
 
   end
