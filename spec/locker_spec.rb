@@ -4,14 +4,6 @@ describe Restruct::Locker do
 
   let(:locker) { Restruct::Locker.new }
 
-  it 'Return block result' do
-    result = locker.lock :process_1 do
-      'OK'  
-    end
-
-    result.must_equal 'OK'
-  end
-
   it 'Flexible' do
     locker.wont_be :locked?
 
@@ -119,5 +111,25 @@ describe Restruct::Locker do
       list.wont_equal expected_list
     end
   end
+
+  it 'Return block result' do
+    result = locker.lock :process_1 do
+      'OK'  
+    end
+
+    result.must_equal 'OK'
+  end
   
+  it 'Unlock when raise error in block' do
+    locker.wont_be :locked?
+
+    proc do
+      locker.lock :process_1 do
+        raise RuntimeError, 'ERROR'
+      end
+    end.must_raise RuntimeError, 'ERROR'
+
+    locker.wont_be :locked?
+  end
+ 
 end
