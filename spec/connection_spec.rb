@@ -51,4 +51,66 @@ describe Restruct::Connection do
 
   end
 
+  describe 'Batch' do
+
+    let (:id) {Restruct.generate_id}
+
+    it 'Execute' do
+      connection.lazy('HSET', id, 'key_1', 'x')
+
+      connection.batch do
+        connection.lazy('HSET', id, 'key_1', 'y')
+        connection.lazy('HSET', id, 'key_2', 'x')
+
+        connection.call('HKEYS', id).must_equal ['key_1']
+        connection.call('HGET', id, 'key_1').must_equal 'x'
+        connection.call('HGET', id, 'key_2').must_be_nil
+      end
+
+      connection.call('HKEYS', id).must_equal ['key_1', 'key_2']
+      connection.call('HGET', id, 'key_1').must_equal 'y'
+      connection.call('HGET', id, 'key_2').must_equal 'x'
+    end
+
+    it 'Discard' do
+      connection.lazy('HSET', id, 'key_1', 'x')
+
+      proc do
+        connection.batch do
+          connection.lazy('HSET', id, 'key_1', 'y')
+          connection.lazy('HSET', id, 'key_2', 'x')
+          raise 'Test error'
+        end
+      end.must_raise RuntimeError
+
+      connection.call('HKEYS', id).must_equal ['key_1']
+      connection.call('HGET', id, 'key_1').must_equal 'x'
+    end
+
+    it 'Nested' do
+      connection.lazy('HSET', id, 'key_1', 'x')
+
+      connection.batch do
+        connection.lazy('HSET', id, 'key_1', 'y')
+        connection.lazy('HSET', id, 'key_2', 'x')
+
+        connection.batch do
+          connection.lazy('HSET', id, 'key_1', 'z')
+          connection.lazy('HSET', id, 'key_2', 'z')
+
+          connection.call('HGET', id, 'key_1').must_equal 'x'
+          connection.call('HGET', id, 'key_2').must_be_nil
+        end
+
+        connection.call('HGET', id, 'key_1').must_equal 'x'
+        connection.call('HGET', id, 'key_2').must_be_nil
+      end
+
+      connection.call('HKEYS', id).must_equal ['key_1', 'key_2']
+      connection.call('HGET', id, 'key_1').must_equal 'z'
+      connection.call('HGET', id, 'key_2').must_equal 'z'
+    end
+
+  end
+
 end

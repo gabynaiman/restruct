@@ -131,5 +131,32 @@ describe Restruct::Locker do
 
     locker.wont_be :locked?
   end
+
+  it 'Batch' do
+    id = Restruct.generate_id[:test]
+    connection.lazy('HSET', id, 'key_1', 'x')
+
+    connection.batch do
+      connection.lazy('HSET', id, 'key_1', 'y')
+
+      locker.wont_be :locked?
+      
+      locker.lock :process_1 do
+        locker.must_be :locked?
+        connection.lazy('HSET', id, 'key_2', 'x')
+        locker.lock :process_1 do
+          connection.lazy('HSET', id, 'key_2', 'z')
+          locker.to_h['nested'].must_equal '2'
+        end
+        locker.must_be :locked?
+        locker.to_h['nested'].must_equal '1'
+      end
+
+      locker.wont_be :locked?
+    end
+    connection.call('HKEYS', id).must_equal ['key_1', 'key_2']
+    connection.call('HGET', id, 'key_1').must_equal 'y'
+    connection.call('HGET', id, 'key_2').must_equal 'z'
+  end
  
 end

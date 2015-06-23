@@ -21,11 +21,11 @@ module Restruct
 
     def restore(dump)
       destroy
-      connection.call 'RESTORE', id, 0, dump
+      connection.lazy 'RESTORE', id, 0, dump
     end
 
     def destroy
-      connection.call 'DEL', id
+      connection.lazy 'DEL', id
     end
 
     def exists?

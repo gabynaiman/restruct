@@ -4,9 +4,9 @@ require 'minitest_helper'
 
   describe klass do
 
-    it 'Push and pop' do
-      queue = klass.new
+    let(:queue) { klass.new }
 
+    it 'Push and pop' do
       queue.must_be :empty?
 
       queue.push 'test_1'
@@ -23,6 +23,18 @@ require 'minitest_helper'
 
       queue.pop.must_equal 'test_2'
       queue.must_be :empty?
+    end
+
+    it 'Batch' do
+      %w(a b c).each {|e| queue.push e}
+
+      queue.connection.batch do
+        queue.push 'd'
+        queue.pop
+        queue.to_a.must_equal %w(a b c)
+      end
+
+      queue.to_a.must_equal %w(b c d)
     end
 
   end

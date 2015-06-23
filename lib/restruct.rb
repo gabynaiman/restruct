@@ -17,7 +17,6 @@ require_relative 'restruct/marshal_array'
 require_relative 'restruct/marshal_set'
 require_relative 'restruct/marshal_hash'
 require_relative 'restruct/marshal_queue'
-require_relative 'restruct/batch'
 require_relative 'restruct/locker'
 require_relative 'restruct/connection'
 

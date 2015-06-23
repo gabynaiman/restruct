@@ -99,11 +99,11 @@ module Restruct
     private
 
     def _add(*members)
-      connection.call 'SADD', id, *members.map { |m| serialize m }
+      connection.lazy 'SADD', id, *members.map { |m| serialize m }
     end
 
     def _delete(*members)
-      connection.call 'SREM', id, *members.map { |m| serialize m }
+      connection.lazy 'SREM', id, *members.map { |m| serialize m }
     end
 
 

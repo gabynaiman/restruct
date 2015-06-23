@@ -25,7 +25,7 @@ module Restruct
     end
 
     def store(key, value)
-      connection.call 'HSET', id, key, serialize(value)
+      connection.lazy 'HSET', id, key, serialize(value)
       value
     end
     alias_method :[]=, :store
@@ -38,7 +38,7 @@ module Restruct
 
     def delete(key)
       value = self[key]
-      connection.call 'HDEL', id, key
+      connection.lazy 'HDEL', id, key
       value
     end
 

@@ -333,6 +333,42 @@ require 'minitest_helper'
       other.to_primitive.must_equal array.to_primitive
     end
 
+    it 'Batch' do
+      fill %w(a b c)
+
+      array.connection.batch do
+        array[1] = 'x'                    #a x c
+        array << 'd'                      #a x c d
+        array.shift                       #x c d
+        array.pop(2)                      #x
+        %w(y h z).each {|e| array << e}   #x y h z
+        array.delete 'h'                  #x y z
+        
+        array.to_a.must_equal %w(a b c)
+      end
+
+      array.to_a.must_equal %w(x y z)
+    end
+
+    it 'Restore/Destroy in batch' do
+      fill %w(a b c)
+      
+      dump = array.dump
+      other = klass.new
+
+      array.connection.batch do
+        array.destroy
+        other.restore dump
+        array.must_be :exists?
+        other.wont_be :exists?
+        array.to_a.must_equal %w(a b c)
+      end
+
+      array.wont_be :exists?
+      other.must_be :exists?
+      other.to_a.must_equal %w(a b c)
+    end
+
   end
 
 end

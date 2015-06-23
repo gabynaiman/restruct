@@ -48,11 +48,11 @@ module Restruct
       validate_index_type! index
       validate_index_bounds! index
 
-      connection.call 'LSET', id, index, serialize(element)
+      connection.lazy 'LSET', id, index, serialize(element)
     end
 
     def push(*elements)
-      connection.call 'RPUSH', id, *elements.map { |e| serialize e }
+      connection.lazy 'RPUSH', id, *elements.map { |e| serialize e }
       self
     end
     alias_method :<<, :push
@@ -70,7 +70,7 @@ module Restruct
 
     def pop(count=1)
       if count == 1
-        deserialize connection.call('RPOP', id)
+        deserialize connection.lazy('RPOP', id)
       else
         [count, size].min.times.map { pop }.reverse
       end
@@ -78,15 +78,15 @@ module Restruct
 
     def shift(count=1)
       if count == 1
-        deserialize connection.call('LPOP', id)
+        deserialize connection.lazy('LPOP', id)
       else
         [count, size].min.times.map { shift }
       end
     end
 
     def delete(element)
-      removed_count = connection.call 'LREM', id, 0, serialize(element)
-      removed_count > 0 ? element : nil
+      removed_count = connection.lazy 'LREM', id, 0, serialize(element)
+      removed_count && removed_count > 0 ? element : nil
     end
 
     def delete_at(index)

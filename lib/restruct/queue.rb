@@ -2,11 +2,11 @@ module Restruct
   class Queue < Structure
 
     def push(object)
-      connection.call 'RPUSH', id, serialize(object)
+      connection.lazy 'RPUSH', id, serialize(object)
     end
 
     def pop
-      deserialize connection.call('LPOP', id)
+      deserialize connection.lazy('LPOP', id)
     end
 
     def size

@@ -20,7 +20,7 @@ require 'minitest_helper'
         hash[:b].must_equal 'y'
         hash[:c].must_be_nil
       end
-      
+
       it 'fetch' do
         fill a: 'x', b: 'y'
 
@@ -32,7 +32,7 @@ require 'minitest_helper'
         error = proc { hash.fetch(:c) }.must_raise KeyError
         error.message.must_equal 'key not found: c'
       end
-      
+
       it 'key' do
         fill a: 'x', b: 'y', c: 'y'
 
@@ -235,6 +235,20 @@ require 'minitest_helper'
 
       other.id.wont_equal hash.id
       other.to_primitive.must_equal hash.to_primitive
+    end
+
+    it 'Batch' do
+      fill a: 'x', b: 'y', c: 'z'
+
+      hash.connection.batch do
+        hash[:d] = 'w'
+        hash.delete :a
+        hash.merge! b: 'x', e: 'v'
+        
+        hash.to_h.must_equal 'a' => 'x', 'b' => 'y', 'c' => 'z'    
+      end
+
+      hash.to_h.must_equal 'b' => 'x', 'c' => 'z', 'd' => 'w', 'e' => 'v'
     end
 
   end

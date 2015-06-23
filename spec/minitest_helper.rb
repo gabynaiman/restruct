@@ -1,6 +1,7 @@
 require 'coverage_helper'
 require 'restruct'
 require 'minitest/autorun'
+require 'minitest/great_expectations'
 require 'turn'
 require 'pry-nav'
 

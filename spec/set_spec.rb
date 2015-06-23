@@ -252,6 +252,23 @@ require 'minitest_helper'
       other.to_primitive.must_equal set.to_primitive
     end
 
+    it 'Batch' do
+      fill %w(a b c)
+
+      set.connection.batch do
+        set.add 'd'                       #a b c d
+        set.add? 'x'                      #a b c d x
+        set.delete 'b'                    #a c d x
+        set.subtract %w(c d)              #a x
+        set.merge %w(x y z)               #a x y z
+        set.delete? 'a'                   #x y z
+        
+        set.to_a.must_equal_contents %w(a b c)
+      end
+
+      set.to_a.must_equal_contents %w(x y z)
+    end
+
   end
 
 end
