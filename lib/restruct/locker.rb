@@ -33,7 +33,7 @@ module Restruct
       begin
         yield
       ensure  
-        connection.script UNREGISTER_LUA, 0, id, key, exclusive
+        connection.script UNREGISTER_LUA, 0, id
       end      
     rescue Restruct::ConnectionError => ex
       raise LockerError.new ex
