@@ -108,7 +108,6 @@ describe Restruct::Locker do
 
       list = connection.call('LRANGE', test_id, 0, -1)
       list.sort.must_equal expected_list
-      list.wont_equal expected_list
     end
   end
 
