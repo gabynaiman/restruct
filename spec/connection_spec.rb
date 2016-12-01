@@ -3,6 +3,7 @@ require 'minitest_helper'
 describe Restruct::Connection do
 
   describe 'Success' do
+    
     it 'call' do
       connection.call('HSET', 'test_id', 'key', 'test_key')
       connection.call('HGET', 'test_id', 'key').must_equal 'test_key'

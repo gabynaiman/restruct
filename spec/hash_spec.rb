@@ -4,11 +4,11 @@ require 'minitest_helper'
 
   describe klass do
 
-    let(:hash) { klass.new }
+    let(:sample_hash) { klass.new }
 
     def fill(data)
-      data.each { |k,v| data[k] = hash.send(:serialize, v) }
-      connection.call 'HMSET', hash.id, *data.flatten
+      data.each { |k,v| data[k] = sample_hash.send(:serialize, v) }
+      connection.call 'HMSET', sample_hash.id, *data.flatten
     end
 
     describe 'Getters' do
@@ -16,44 +16,44 @@ require 'minitest_helper'
       it '[]' do
         fill a: 'x', b: 'y'
 
-        hash[:a].must_equal 'x'
-        hash[:b].must_equal 'y'
-        hash[:c].must_be_nil
+        sample_hash[:a].must_equal 'x'
+        sample_hash[:b].must_equal 'y'
+        sample_hash[:c].must_be_nil
       end
 
       it 'fetch' do
         fill a: 'x', b: 'y'
 
-        hash.fetch(:a).must_equal 'x'
-        hash.fetch(:b).must_equal 'y'
-        hash.fetch(:c, 'z').must_equal 'z'
-        hash.fetch(:c) { |k| k.to_s }.must_equal 'c'
+        sample_hash.fetch(:a).must_equal 'x'
+        sample_hash.fetch(:b).must_equal 'y'
+        sample_hash.fetch(:c, 'z').must_equal 'z'
+        sample_hash.fetch(:c) { |k| k.to_s }.must_equal 'c'
         
-        error = proc { hash.fetch(:c) }.must_raise KeyError
+        error = proc { sample_hash.fetch(:c) }.must_raise KeyError
         error.message.must_equal 'key not found: c'
       end
 
       it 'key' do
         fill a: 'x', b: 'y', c: 'y'
 
-        hash.key('x').must_equal 'a'
-        hash.key('y').must_equal 'b'
-        hash.key('z').must_be_nil
+        sample_hash.key('x').must_equal 'a'
+        sample_hash.key('y').must_equal 'b'
+        sample_hash.key('z').must_be_nil
       end
 
       it 'keys' do
         fill a: 'x', b: 'y', c: 'z'
-        hash.keys.must_equal %w(a b c)
+        sample_hash.keys.must_equal %w(a b c)
       end
 
       it 'values' do
         fill a: 'x', b: 'y', c: 'z'
-        hash.values.must_equal %w(x y z)
+        sample_hash.values.must_equal %w(x y z)
       end
 
       it 'values_at' do
         fill a: 'x', b: 'y', c: 'z'
-        hash.values_at(:a, :f, :b, :g, :c).must_equal ['x', nil, 'y', nil, 'z']
+        sample_hash.values_at(:a, :f, :b, :g, :c).must_equal ['x', nil, 'y', nil, 'z']
       end
 
     end
@@ -64,11 +64,11 @@ require 'minitest_helper'
         it method do
           fill a: 'x', b: 'y'
 
-          hash.send(method, :a, 'a').must_equal 'a'
-          hash.to_h.must_equal 'a' => 'a', 'b' => 'y'
+          sample_hash.send(method, :a, 'a').must_equal 'a'
+          sample_hash.to_h.must_equal 'a' => 'a', 'b' => 'y'
 
-          hash.send(method, :c, 'z').must_equal 'z'
-          hash.to_h.must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
+          sample_hash.send(method, :c, 'z').must_equal 'z'
+          sample_hash.to_h.must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
         end
       end
 
@@ -76,42 +76,42 @@ require 'minitest_helper'
         it method do
           fill a: 'x', b: 'y'
 
-          hash.send(method, a: 'a', c: 'z').must_equal hash
-          hash.to_h.must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
+          sample_hash.send(method, a: 'a', c: 'z').must_equal sample_hash
+          sample_hash.to_h.must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
         end
       end
       
       it 'delete' do
         fill a: 'x', b: 'y'
 
-        hash.delete(:b).must_equal 'y'
-        hash.to_h.must_equal 'a' => 'x'
+        sample_hash.delete(:b).must_equal 'y'
+        sample_hash.to_h.must_equal 'a' => 'x'
         
-        hash.delete(:c).must_be_nil
-        hash.to_h.must_equal 'a' => 'x'
+        sample_hash.delete(:c).must_be_nil
+        sample_hash.to_h.must_equal 'a' => 'x'
       end
       
       it 'delete_if' do
         fill a: 'x', b: 'y'
 
-        hash.delete_if { |k,v| v == 'x' }.must_equal hash
-        hash.to_h.must_equal 'b' => 'y'
+        sample_hash.delete_if { |k,v| v == 'x' }.must_equal sample_hash
+        sample_hash.to_h.must_equal 'b' => 'y'
       end
 
       %w(keep_if select!).each do |method|
         it method do
           fill a: 'x', b: 'y'
 
-          hash.send(method) { |k,v| v == 'x' }.must_equal hash
-          hash.to_h.must_equal 'a' => 'x'
+          sample_hash.send(method) { |k,v| v == 'x' }.must_equal sample_hash
+          sample_hash.to_h.must_equal 'a' => 'x'
         end
       end
       
       it 'clear' do
         fill a: 'x', b: 'y'
 
-        hash.clear.must_equal hash
-        hash.must_be_empty
+        sample_hash.clear.must_equal sample_hash
+        sample_hash.must_be_empty
       end
 
     end
@@ -121,22 +121,22 @@ require 'minitest_helper'
       %w(size count length).each do |method|
         it method do
           fill a: 'x', b: 'y'
-          hash.send(method).must_equal 2
+          sample_hash.send(method).must_equal 2
         end
       end
       
       it 'empty?' do
-        hash.must_be :empty?
+        sample_hash.must_be :empty?
         fill a: 'x', b: 'y'
-        hash.wont_be :empty?
+        sample_hash.wont_be :empty?
       end
 
       %w(key? has_key?).each do |method|
         it method do
           fill a: 'x', b: 'y'
 
-          assert hash.send(method, :a)
-          refute hash.send(method, :c)
+          assert sample_hash.send(method, :a)
+          refute sample_hash.send(method, :c)
         end
       end
       
@@ -144,8 +144,8 @@ require 'minitest_helper'
         it method do
           fill a: 'x', b: 'y'
 
-          assert hash.send(method, 'x')
-          refute hash.send(method, 'z')
+          assert sample_hash.send(method, 'x')
+          refute sample_hash.send(method, 'z')
         end
       end
 
@@ -156,23 +156,23 @@ require 'minitest_helper'
       %w(to_h to_primitive).each do |method|
         it method do
           fill a: 'x', b: 'y'
-          hash.send(method).must_equal 'a' => 'x', 'b' => 'y'
+          sample_hash.send(method).must_equal 'a' => 'x', 'b' => 'y'
         end
       end
 
       it 'merge' do
         fill a: 'x', b: 'y'
-        hash.merge('c' => 'z', 'a' => 'a').must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
+        sample_hash.merge('c' => 'z', 'a' => 'a').must_equal 'a' => 'a', 'b' => 'y', 'c' => 'z'
       end
       
       it 'flatten' do
         fill a: 'x', b: 'y'
-        hash.flatten.must_equal %w(a x b y)
+        sample_hash.flatten.must_equal %w(a x b y)
       end
 
       it 'invert' do
         fill a: 'x', b: 'y'
-        hash.invert.must_equal 'x' => 'a', 'y' => 'b'
+        sample_hash.invert.must_equal 'x' => 'a', 'y' => 'b'
       end
 
     end
@@ -189,13 +189,13 @@ require 'minitest_helper'
 
           keys = []
           values = []
-          hash.send(method) do |k,v|
+          sample_hash.send(method) do |k,v|
             keys << k
             values << v
           end
 
-          keys.must_equal hash.keys
-          values.must_equal hash.values
+          keys.must_equal sample_hash.keys
+          values.must_equal sample_hash.values
         end
       end
       
@@ -203,52 +203,52 @@ require 'minitest_helper'
         fill a: 'x', b: 'y'
 
         keys = []
-        hash.each_key { |k| keys << k }
+        sample_hash.each_key { |k| keys << k }
 
-        keys.must_equal hash.keys
+        keys.must_equal sample_hash.keys
       end
       
       it 'each_value' do
         fill a: 'x', b: 'y'
 
         values = []
-        hash.each_value { |v| values << v }
+        sample_hash.each_value { |v| values << v }
 
-        values.must_equal hash.values
+        values.must_equal sample_hash.values
       end
 
     end
 
     it 'Equality' do
-      copy = klass.new id: hash.id
-      assert hash == copy
-      assert hash.eql? copy
-      refute hash.equal? copy
+      copy = klass.new id: sample_hash.id
+      assert sample_hash == copy
+      assert sample_hash.eql? copy
+      refute sample_hash.equal? copy
     end
 
     it 'Dump/Restore' do
       fill a: 'x', b: 'y'
       
-      dump = hash.dump
+      dump = sample_hash.dump
       other = klass.new
       other.restore dump
 
-      other.id.wont_equal hash.id
-      other.to_primitive.must_equal hash.to_primitive
+      other.id.wont_equal sample_hash.id
+      other.to_primitive.must_equal sample_hash.to_primitive
     end
 
     it 'Batch' do
       fill a: 'x', b: 'y', c: 'z'
 
-      hash.connection.batch do
-        hash[:d] = 'w'
-        hash.delete :a
-        hash.merge! b: 'x', e: 'v'
+      sample_hash.connection.batch do
+        sample_hash[:d] = 'w'
+        sample_hash.delete :a
+        sample_hash.merge! b: 'x', e: 'v'
         
-        hash.to_h.must_equal 'a' => 'x', 'b' => 'y', 'c' => 'z'    
+        sample_hash.to_h.must_equal 'a' => 'x', 'b' => 'y', 'c' => 'z'    
       end
 
-      hash.to_h.must_equal 'b' => 'x', 'c' => 'z', 'd' => 'w', 'e' => 'v'
+      sample_hash.to_h.must_equal 'b' => 'x', 'c' => 'z', 'd' => 'w', 'e' => 'v'
     end
 
   end
