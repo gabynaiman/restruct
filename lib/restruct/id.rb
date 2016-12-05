@@ -3,6 +3,10 @@ module Restruct
     
     attr_reader :separator
 
+    def self.[](id)
+      new id
+    end
+
     def initialize(id, separator=nil)
       @separator = separator || Restruct.id_separator
       super id.to_s

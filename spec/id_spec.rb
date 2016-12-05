@@ -21,8 +21,7 @@ describe Restruct::Id do
   end
 
   it 'Be chainable' do
-    id = Id.new 'foo'
-    id['bar']['baz'].must_equal 'foo:bar:baz'
+    Id['foo']['bar']['baz'].must_equal 'foo:bar:baz'
   end
 
   it 'Accept symbols' do
