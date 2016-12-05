@@ -11,6 +11,8 @@ module Restruct
       loop do
         yield deserialize(subscriber.read.last)
       end
+    rescue => ex
+      raise ex
     ensure
       subscriber.call 'UNSUBSCRIBE', id
     end
