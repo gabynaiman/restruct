@@ -4,20 +4,22 @@ require 'minitest_helper'
 
   describe klass do
 
-    let(:channel) { klass.new }
+    let(:channel_1) { klass.new }
+    let(:channel_2) { klass.new }
 
     it 'Subscribe and publish' do
       messages = []
 
       Thread.new do
-        channel.subscribe do |message|
+        channel_1.subscribe do |message|
           messages << message
         end
       end
       sleep 0.01 # Wait for establish connection
 
       3.times do |i|
-        channel.publish "Message #{i}"
+        channel_1.publish "Message #{i}"
+        channel_2.publish "Message #{i}"
       end
 
       Timeout.timeout(3) do
