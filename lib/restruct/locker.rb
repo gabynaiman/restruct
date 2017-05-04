@@ -29,7 +29,7 @@ module Restruct
     private
 
     def _lock(key, exclusive)
-      connection.script REGISTER_LUA,   0, id, key, exclusive
+      connection.script REGISTER_LUA, 0, id, key, exclusive
       begin
         yield
       ensure  
