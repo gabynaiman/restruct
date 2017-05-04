@@ -2,7 +2,6 @@ module Restruct
   class Connection
 
     def initialize(*args)
-      @args = args
       @redis = Redic.new *args
       @scripts = {}
       @nesting = ::Hash.new { |h,k| h[k] = 0 }
@@ -43,14 +42,6 @@ module Restruct
     rescue => ex   
       redis.clear unless nested?
       raise ex
-    end
-
-    def read
-      redis.client.read
-    end
-
-    def clone
-      Connection.new *@args
     end
 
     private 
