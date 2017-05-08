@@ -14,7 +14,6 @@ Redis structures
 - NestedHash
 - Queue
 - Locker
-- Channel
 
 ## Installation
 
