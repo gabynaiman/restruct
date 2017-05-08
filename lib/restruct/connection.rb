@@ -1,8 +1,23 @@
 module Restruct
+
   class Connection
 
-    def initialize(*args)
-      @redis = Redic.new *args
+    class << self
+
+      def simple(*args)
+        new Redic.new(*args)
+      end
+
+      def with_sentinels(*args)
+        new Redic::Sentinels.new(*args)
+      end
+
+      private :new
+
+    end
+
+    def initialize(redis=nil)
+      @redis = redis || Redic.new
       @scripts = {}
       @nesting = ::Hash.new { |h,k| h[k] = 0 }
     end

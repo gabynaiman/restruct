@@ -85,7 +85,7 @@ describe Restruct::Locker do
 
       pids = 10.times.map do |thread_number|
         Process.fork do
-          connection = Restruct::Connection.new
+          connection = Restruct::Connection.simple
           locker = Restruct::Locker.new id: locker_id, connection: connection
           10.times do |iteration|
             locker.lock :process_1 do

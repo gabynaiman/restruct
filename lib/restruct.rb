@@ -1,4 +1,5 @@
 require 'redic'
+require 'redic-sentinels'
 require 'class_config'
 require 'forwardable'
 require 'securerandom'
@@ -25,7 +26,7 @@ module Restruct
 
   extend ClassConfig
 
-  attr_config :connection, Connection.new
+  attr_config :connection, Connection.simple
   attr_config :id_separator, ':'
   attr_config :id_generator, ->() { Id.new(:restruct)[SecureRandom.uuid] }
 
