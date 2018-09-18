@@ -4,12 +4,11 @@ require 'minitest_helper'
 
   describe klass do
 
-    let(:sample_cache) { klass.new ttl: 500 }
+    let(:sample_cache) { klass.new }
 
     def fill(data)
       data.each do |k,v|
         connection.call 'SET', sample_cache.id[k], sample_cache.send(:serialize, v)
-        connection.call 'EXPIRE', sample_cache.id[k], sample_cache.ttl
       end
     end
 
@@ -34,6 +33,15 @@ require 'minitest_helper'
       it 'keys' do
         fill a: 'x', b: 'y', c: 'z'
         sample_cache.keys.must_equal %w(a b c)
+      end
+
+      it 'TTL' do
+        sample_cache = klass.new ttl: 1
+        sample_cache[:a] = 'x'
+
+        sample_cache[:a].must_equal 'x'
+        sleep 1
+        sample_cache[:a].must_be_nil
       end
 
     end
@@ -113,7 +121,7 @@ require 'minitest_helper'
     end
 
     it 'Equality' do
-      copy = klass.new id: sample_cache.id, ttl: sample_cache.ttl
+      copy = klass.new id: sample_cache.id
       assert sample_cache == copy
       assert sample_cache.eql? copy
       refute sample_cache.equal? copy
@@ -123,7 +131,7 @@ require 'minitest_helper'
       fill a: 'x', b: 'y'
       
       dump = sample_cache.dump
-      other = klass.new ttl: sample_cache.ttl
+      other = klass.new
       other.restore dump
 
       other.id.wont_equal sample_cache.id

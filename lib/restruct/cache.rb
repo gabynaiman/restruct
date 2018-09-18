@@ -7,7 +7,7 @@ module Restruct
 
     def initialize(options={})
       super options
-      @ttl = options.fetch(:ttl)
+      @ttl = options[:ttl]
     end
 
     def key?(key)
@@ -28,7 +28,7 @@ module Restruct
 
     def []=(key, value)
       connection.lazy 'SET', id[key], serialize(value)
-      connection.lazy 'EXPIRE', id[key], ttl
+      connection.lazy 'EXPIRE', id[key], ttl if ttl
     end
 
     def delete(key)
@@ -39,7 +39,7 @@ module Restruct
 
     def fetch(key, &block)
       if key? key
-        connection.lazy 'EXPIRE', id[key], ttl
+        connection.lazy 'EXPIRE', id[key], ttl if ttl
         self[key]
       else
         value = block.call
