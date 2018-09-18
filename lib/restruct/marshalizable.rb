@@ -6,7 +6,7 @@ module Restruct
     end
     
     def deserialize(element)
-      Marshal.load element if element
+      Marshal.load element unless element.nil?
     end
 
   end
