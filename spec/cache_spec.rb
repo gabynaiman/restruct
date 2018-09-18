@@ -40,7 +40,7 @@ require 'minitest_helper'
         sample_cache[:a] = 'x'
 
         sample_cache[:a].must_equal 'x'
-        sleep 1
+        sleep 1.1
         sample_cache[:a].must_be_nil
       end
 
