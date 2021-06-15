@@ -1,10 +1,9 @@
 # Restruct
 
 [![Gem Version](https://badge.fury.io/rb/restruct.svg)](https://rubygems.org/gems/restruct)
-[![Build Status](https://travis-ci.org/gabynaiman/restruct.svg?branch=master)](https://travis-ci.org/gabynaiman/restruct)
+[![Build Status](https://travis-ci.com/gabynaiman/restruct.svg?branch=master)](https://travis-ci.com/gabynaiman/restruct)
 [![Coverage Status](https://coveralls.io/repos/gabynaiman/restruct/badge.svg?branch=master)](https://coveralls.io/r/gabynaiman/restruct?branch=master)
 [![Code Climate](https://codeclimate.com/github/gabynaiman/restruct.svg)](https://codeclimate.com/github/gabynaiman/restruct)
-[![Dependency Status](https://gemnasium.com/gabynaiman/restruct.svg)](https://gemnasium.com/gabynaiman/restruct)
 
 Redis structures
 
