@@ -249,6 +249,39 @@ hash['user'] # => {:id=>1, :tags=>['admin']}
 
 Available classes: `MarshalArray`, `MarshalSet`, `MarshalHash`, `MarshalQueue`, `MarshalCache`.
 
+### Id
+
+Composable key builder for constructing Redis keys with a configurable separator (default: `:`). Sections can be chained using `[]`.
+
+```ruby
+id = Restruct::Id.new('foo')
+id.to_s             # => 'foo'
+id['bar']           # => 'foo:bar'
+id['bar']['baz']    # => 'foo:bar:baz'
+
+# Shorthand constructor
+Restruct::Id[:foo]          # => 'foo'
+Restruct::Id['foo']['bar']  # => 'foo:bar'
+
+# Accepts symbols and numbers
+id[:bar]   # => 'foo:bar'
+id[3]      # => 'foo:3'
+
+# Split an id back into its sections
+id['bar']['baz'].sections  # => ['foo', 'bar', 'baz']
+
+# Custom separator
+id = Restruct::Id.new('foo', '|')
+id['bar']['baz']  # => 'foo|bar|baz'
+```
+
+Every structure uses an `Id` as its Redis key. You can pass a custom id when creating a structure:
+
+```ruby
+array = Restruct::Array.new(id: Restruct::Id['my_app']['lists']['main'])
+# Redis key will be 'my_app:lists:main'
+```
+
 ### Common Features
 
 All structures support:
