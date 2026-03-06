@@ -46,8 +46,10 @@ module Restruct
     end
     
     def parse_message(message)
-      match_data = /^(ERR Error running script.*@user_script.*user_script.*: )/.match message
-      match_data ? message.gsub(match_data.captures.first,'').strip : message
+      message = message.sub(/^ERR Error running script.*user_script.*: /, '')
+      message = message.sub(/^ERR user_script:\d+: /, '')
+      message = message.sub(/ script: \h+, on @user_script:\d+\.\z/, '')
+      message.strip
     end
   end
 
