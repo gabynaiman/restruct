@@ -1,7 +1,8 @@
 # Restruct
 
 [![Gem Version](https://badge.fury.io/rb/restruct.svg)](https://rubygems.org/gems/restruct)
-[![Coverage Status](https://coveralls.io/repos/gabynaiman/restruct/badge.svg?branch=master)](https://coveralls.io/r/gabynaiman/restruct?branch=master)
+[![CI](https://github.com/gabynaiman/restruct/actions/workflows/ci.yml/badge.svg)](https://github.com/gabynaiman/restruct/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-check%20artifacts-blue)](https://github.com/gabynaiman/restruct/actions/workflows/ci.yml)
 
 Ruby data structures backed by Redis. Provides persistent, distributed versions of common collections that can be shared across processes and servers.
 
